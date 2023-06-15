@@ -1,0 +1,73 @@
+#include <SPI.h> // módulo de rede
+#include <UIPEthernet.h> // módulo de rede
+#include <PubSubClient.h> // mqtt
+#include <DHT11.h>
+
+// Create an instance of the DHT11 class and set the digital I/O pin.
+DHT11 dht11(6);
+
+const int redled = 2;
+const int greenled = 3;
+const int blueled = 4;
+const int buzzer = 5;
+
+
+void setup()
+{
+    // Initialize serial communication at 115200 baud.
+    Serial.begin(9600);
+    pinMode(redled, OUTPUT);
+    pinMode(greenled, OUTPUT);
+    pinMode(blueled, OUTPUT);
+    pinMode(buzzer, OUTPUT);
+}
+
+void loop()
+ {
+    // Read the temperature from the sensor.
+    float temperature = dht11.readTemperature();
+
+    // If the temperature reading was successful, print it to the serial monitor.
+    if (temperature > 20)
+    {
+        Serial.print("Temperatura (C): ");
+        Serial.print(temperature);
+        Serial.println(" C");
+        setColor(255, 255, 255); //PARÂMETROS PARA PRODUZIR A COR VERME
+        noTone(buzzer);
+    }
+    else if (temperature > 35)
+    {
+        Serial.print("Temperatura (C): ");
+        Serial.print(temperature);
+        Serial.println(" C");
+        setColor(255, 0, 0); //PARÂMETROS PARA PRODUZIR A COR VERMELHA
+        tone(buzzer,1900,500); 
+        delay(1000);
+    }
+    else if (temperature < 20)
+    {
+        Serial.print("Temperatura (C): ");
+        Serial.print(temperature);
+        Serial.println(" C");
+        setColor(255, 0, 0); //PARÂMETROS PARA PRODUZIR A COR VERMELHA
+        tone(buzzer,1900,500); 
+        delay(1000);
+
+    }
+
+    // Wait for 2 seconds before the next reading.
+    delay(10);
+ }
+
+void setColor(int vermelho, int verde, int azul){
+  
+    #ifdef COMMON_ANODE //SE O LED RGB FOR DEFINIDO COMO ANODO COMUM, FAZ
+      vermelho = 255 - vermelho; //VARIÁVEL RECEBE O RESULTADO DA OPERAÇÃO '255 MENOS O PARÂMETRO (vermelho) INFORMADO' NA CHAMADA DA FUNÇÃO
+      verde = 255 - verde; //VARIÁVEL RECEBE O RESULTADO DA OPERAÇÃO '255 MENOS O PARÂMETRO (verde) INFORMADO' NA CHAMADA DA FUNÇÃO
+      azul = 255 - azul; //VARIÁVEL RECEBE O RESULTADO DA OPERAÇÃO '255 MENOS O PARÂMETRO (azul) INFORMADO' NA CHAMADA DA FUNÇÃO
+    #endif
+    analogWrite(redled, vermelho); //DEFINE O BRILHO DO LED DE ACORDO COM O VALOR INFORMADO PELA VARIÁVEL 'vermelho'
+    analogWrite(greenled, verde); //DEFINE O BRILHO DO LED DE ACORDO COM O VALOR INFORMADO PELA VARIÁVEL 'verde'
+    analogWrite(blueled, azul); //DEFINE O BRILHO DO LED DE ACORDO COM O VALOR INFORMADO PELA VARIÁVEL 'azul'
+}
